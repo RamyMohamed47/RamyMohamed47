@@ -101,24 +101,26 @@ I try to approach engineering problems by thinking about:
 I’m especially interested in the problems that appear after the happy path — concurrent requests, authorization boundaries, partial failures, stale state, data consistency, and systems that need to evolve without becoming impossible to maintain.
 
 ---
-
+<!--
 ## 📊 GitHub
 
 <p align="left">
   <img src="https://github-readme-stats.vercel.app/api?username=RamyMohamed47&show_icons=true&hide_border=true&rank_icon=github" height="160"/>
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=RamyMohamed47&layout=compact&hide_border=true" height="160"/>
+  <img src="https://github-profile-trophy.vercel.app/?username=RamyMohamed478&theme=onedark&no-frame=true&margin-w=10" />
 </p>
 
 ---
-
+-->
 ## 🤝 Let's Connect
-
 * 💼 Open to **Backend / Full-Stack JavaScript opportunities**
 * 📍 Egypt
 * 💻 GitHub: [@RamyMohamed47](https://github.com/RamyMohamed47)
 * 💼 LinkedIn: [Ramy Mohamed](https://linkedin.com/in/ramy-mohamed-b84920217/)
+* ✉️ Email : mohamedramy228@ymail.com
 * 🎨 Portfolio: (TBD)
-
+<img src="./profile/stats.svg" height="160"/>
+<img src="./profile/top-langs.svg" height="160"/>
 ---
 
 ### Thanks for stopping by 👋
