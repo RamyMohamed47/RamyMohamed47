@@ -1,8 +1,6 @@
 name: Generate GitHub Stats
 
 on:
-  schedule:
-    - cron: '17 0 * * *'
   workflow_dispatch:
 
 permissions:
@@ -75,7 +73,6 @@ jobs:
           total_bytes = sum(languages.values()) or 1
           top_languages = [(name, round(value / total_bytes * 100, 1)) for name, value in languages.most_common(6)]
 
-          # Query GitHub's GraphQL API for the contribution total.
           query = '''
           query($login:String!) {
             user(login:$login) {
