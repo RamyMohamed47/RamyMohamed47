@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="180" viewBox="0 0 495 180">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#161b22"/>
+        <stop offset="100%" stop-color="#0d1117"/>
+      </linearGradient>
+    </defs>
+    <rect width="100%" height="100%" rx="12" fill="url(#bg)" stroke="#30363d"/>
+    <text x="24" y="34" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">Top Languages</text><rect x="24.0" y="65" width="203.4" height="8" fill="#58a6ff"/><rect x="227.4" y="65" width="69.7" height="8" fill="#58a6ff"/><rect x="297.1" y="65" width="68.4" height="8" fill="#58a6ff"/><rect x="365.5" y="65" width="56.3" height="8" fill="#58a6ff"/><rect x="421.8" y="65" width="23.2" height="8" fill="#58a6ff"/><rect x="445.1" y="65" width="13.0" height="8" fill="#58a6ff"/>
+      <circle cx="29" cy="98" r="4" fill="#58a6ff"/>
+      <text x="42" y="102" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">TypeScript</text>
+      <text x="445" y="102" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">45.5%</text>
+      <circle cx="29" cy="118" r="4" fill="#58a6ff"/>
+      <text x="42" y="122" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">JavaScript</text>
+      <text x="445" y="122" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">15.6%</text>
+      <circle cx="29" cy="138" r="4" fill="#58a6ff"/>
+      <text x="42" y="142" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">C#</text>
+      <text x="445" y="142" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">15.3%</text>
+      <circle cx="29" cy="158" r="4" fill="#58a6ff"/>
+      <text x="42" y="162" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">HTML</text>
+      <text x="445" y="162" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">12.6%</text>
+      <circle cx="29" cy="178" r="4" fill="#58a6ff"/>
+      <text x="42" y="182" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">CSS</text>
+      <text x="445" y="182" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">5.2%</text>
+      <circle cx="29" cy="198" r="4" fill="#58a6ff"/>
+      <text x="42" y="202" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">Pug</text>
+      <text x="445" y="202" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">2.9%</text></svg>
