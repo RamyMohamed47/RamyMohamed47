@@ -1,0 +1,172 @@
+name: Generate GitHub Stats
+
+on:
+  schedule:
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate SVG cards
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: RamyMohamed47
+        run: |
+          set -euo pipefail
+
+          mkdir -p profile
+
+          python3 <<'PY'
+          import json
+          import os
+          import urllib.request
+          from collections import Counter
+          from datetime import datetime, timezone
+          from xml.sax.saxutils import escape
+
+          token = os.environ["GH_TOKEN"]
+          username = os.environ["GITHUB_USERNAME"]
+
+          def request(url):
+              req = urllib.request.Request(url, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/vnd.github+json",
+                  "X-GitHub-Api-Version": "2022-11-28",
+              })
+              with urllib.request.urlopen(req) as response:
+                  return json.load(response)
+
+          user = request(f"https://api.github.com/users/{username}")
+
+          repos = []
+          page = 1
+          while True:
+              batch = request(
+                  f"https://api.github.com/users/{username}/repos?per_page=100&page={page}&type=owner&sort=updated"
+              )
+              repos.extend(batch)
+              if len(batch) < 100:
+                  break
+              page += 1
+
+          stars = sum(r["stargazers_count"] for r in repos)
+          forks = sum(r["forks_count"] for r in repos)
+          public_repos = user["public_repos"]
+          followers = user["followers"]
+
+          languages = Counter()
+          for repo in repos:
+              if repo.get("fork"):
+                  continue
+              try:
+                  data = request(repo["languages_url"])
+                  languages.update(data)
+              except Exception:
+                  pass
+
+          total_bytes = sum(languages.values()) or 1
+          top_languages = [(name, round(value / total_bytes * 100, 1)) for name, value in languages.most_common(6)]
+
+          # Query GitHub's GraphQL API for the contribution total.
+          query = '''
+          query($login:String!) {
+            user(login:$login) {
+              contributionsCollection {
+                contributionCalendar {
+                  totalContributions
+                }
+              }
+            }
+          }
+          '''
+          payload = json.dumps({"query": query, "variables": {"login": username}}).encode()
+          req = urllib.request.Request(
+              "https://api.github.com/graphql",
+              data=payload,
+              headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+                  "Accept": "application/vnd.github+json",
+              },
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req) as response:
+                  contribution_data = json.load(response)
+              contributions = contribution_data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+          except Exception:
+              contributions = 0
+
+          def svg_header(width, height, title):
+              return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">
+              <defs>
+                <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#161b22"/>
+                  <stop offset="100%" stop-color="#0d1117"/>
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" rx="12" fill="url(#bg)" stroke="#30363d"/>
+              <text x="24" y="34" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700">{escape(title)}</text>'''
+
+          stats = svg_header(495, 180, "GitHub Stats")
+          stats += f'''
+            <text x="24" y="76" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Public repositories</text>
+            <text x="24" y="100" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">{public_repos}</text>
+            <text x="175" y="76" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Total stars</text>
+            <text x="175" y="100" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">{stars}</text>
+            <text x="326" y="76" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Followers</text>
+            <text x="326" y="100" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">{followers}</text>
+            <text x="24" y="132" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Contributions this year</text>
+            <text x="24" y="156" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">{contributions}</text>
+            <text x="175" y="132" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Forks received</text>
+            <text x="175" y="156" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">{forks}</text>
+            <text x="326" y="132" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">Updated</text>
+            <text x="326" y="156" fill="#f0f6fc" font-family="Arial, Helvetica, sans-serif" font-size="13">{datetime.now(timezone.utc).strftime('%Y-%m-%d')}</text>
+          </svg>'''
+
+          langs = svg_header(495, 180, "Top Languages")
+          x = 24
+          y = 65
+          bar_width = 447
+          current_x = x
+          for name, percent in top_languages:
+              width = max(2, bar_width * percent / 100)
+              langs += f'<rect x="{current_x:.1f}" y="{y}" width="{width:.1f}" height="8" fill="#58a6ff"/>'
+              current_x += width
+          if not top_languages:
+              langs += f'<rect x="{x}" y="{y}" width="{bar_width}" height="8" fill="#30363d"/>'
+
+          ly = 102
+          for name, percent in top_languages:
+              langs += f'''
+                <circle cx="29" cy="{ly-4}" r="4" fill="#58a6ff"/>
+                <text x="42" y="{ly}" fill="#c9d1d9" font-family="Arial, Helvetica, sans-serif" font-size="12">{escape(name)}</text>
+                <text x="445" y="{ly}" text-anchor="end" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="12">{percent}%</text>'''
+              ly += 20
+          langs += '</svg>'
+
+          with open("profile/stats.svg", "w", encoding="utf-8") as f:
+              f.write(stats)
+          with open("profile/top-langs.svg", "w", encoding="utf-8") as f:
+              f.write(langs)
+          PY
+
+      - name: Commit generated cards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add profile/stats.svg profile/top-langs.svg
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update GitHub stats cards"
+            git push
+          fi
